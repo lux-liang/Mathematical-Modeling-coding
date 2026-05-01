@@ -1,0 +1,4 @@
+# High Risk Replacement
+
+replace_target old_task_key candidate_task_key candidate_target candidate_task_type  old_worst_margin  candidate_worst_margin  candidate_feasible_rate  coverage_delta  better_worst_margin  replacement_found                                                                                                       reason
+           P10 拍照|P10|494.9       射击|S01|494.8              S01                  射击               0.0                0.191983                      1.0               0                 True               True screened candidate improves worst-case margin; full MILP feasibility should be preferred for final selection

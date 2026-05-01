@@ -1,0 +1,5 @@
+﻿method,speed_max,speed_p95,acceleration_max,acceleration_p95,feasible_shooting_candidate_count,feasible_photo_candidate_count,total_candidate_count,MILP_selected_count,coverage_count,normalized_margin_sum,selected_task_IDs
+CubicSpline,8.322158507913496,6.50886285993053,13.628498548096445,8.479013796064383,9,0,9,1,1,0.043,S11射击
+PCHIP,8.230717822430275,6.480063485984298,12.743152406236163,7.53332462042453,12,0,12,1,1,0.073,S12射击
+linear+Savitzky-Golay,7.141828716680923,6.462147059078688,1.8011076507480708,1.1075809813451378,461,161,622,9,9,1.565,P10拍照|P03拍照|P04拍照|P11拍照|P01拍照|P02拍照|S10射击|S11射击|S12射击
+CubicSpline+Savitzky-Golay,7.150772132857066,6.4712507466440075,1.7381525053989288,1.1285401281904772,464,162,626,9,9,1.294,P11拍照|P10拍照|P03拍照|P04拍照|P01拍照|P02拍照|S10射击|S12射击|S11射击

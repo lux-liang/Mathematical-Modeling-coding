@@ -1,0 +1,2 @@
+﻿method,window_length,polyorder,fidelity_error,speed_p95,acceleration_p95,acceleration_max,jerk_p95,feasible_candidate_count,selected_task_count,margin_sum,selected_task_ids,score
+cubic_savgol,81,3,0.9144564652926559,6.468326231771634,1.0341937659646347,1.8140935650924406,0.5287120686681827,607,9,2.278,S05射击|P11拍照|P03拍照|P04拍照|P01拍照|P02拍照|S11射击|S10射击|S12射击,9082.693712879314

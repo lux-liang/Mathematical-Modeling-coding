@@ -1,0 +1,10 @@
+﻿task_id,type,target_id,execution_time,nominal_margin,worst_case_margin,feasible_rate_under_weight_scenarios,feasible_rate_under_smoothing_scenarios,feasible_rate_under_time_shift,feasible_under_tightened_constraints,robust_score,risk_level,bottleneck_constraint
+1,射击,S04,482.95,0.187,0.0,0.0,0.0,1.0,True,0.2,high,
+2,拍照,P04,493.75,0.143,0.0,0.8,0.45,1.0,True,0.56,medium,
+3,拍照,P03,494.35,0.229,0.03256423301975694,1.0,0.35,1.0,True,0.6997706618205892,medium,
+4,拍照,P10,494.95,0.249,0.0,0.0,0.25,1.0,True,0.2,high,
+5,拍照,P11,495.55,0.149,0.034449052725057605,1.0,0.3,1.0,True,0.7309205936494643,medium,
+6,拍照,P01,508.75,0.141,0.0,0.8,0.4,1.0,True,0.56,medium,
+7,拍照,P02,509.65,0.242,0.03892589569952835,1.0,0.5,1.0,True,0.706297783036508,medium,
+8,射击,S11,523.75,0.133,0.0,0.8,0.4,1.0,True,0.56,medium,
+9,射击,S12,763.75,0.2,0.09667618292788938,1.0,0.2,1.0,True,0.8191833201238063,low,

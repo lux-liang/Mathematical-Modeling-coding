@@ -1,0 +1,5 @@
+﻿version,selected_task_count,coverage_count,nominal_margin_sum,worst_case_margin_sum,min_task_margin,scenario_feasible_rate,smoothing_stability_score,refined_margin_gain,recommendation
+Version 1 baseline,9,9,1.3460578723683068,0.32927306988473637,0.0,0.8444444444444444,0.1111111111111111,0.0,baseline reference
+Version 2 data-driven smoothing,9,9,1.3460578723683068,0.32927306988473637,0.0,0.8444444444444444,0.1111111111111111,0.0,use if smoothing selection keeps same task set
+Version 3 robust scenario MILP,9,9,1.2554054042208207,0.4081482120692893,0.0,0.9333333333333333,0.1111111111111111,0.0,recommended robust main model
+Version 4 state-space estimated weight + robust check,9,9,1.0046430140985334,0.6338267872256865,0.0,0.9555555555555555,0.1111111111111111,0.0,diagnostic weight w1=0.291; do not replace scenario robustness blindly

@@ -1,0 +1,2 @@
+﻿block_length,block_seconds,bx_ci_low,bx_median,bx_ci_high,by_ci_low,by_median,by_ci_high,bias_norm_ci_low,bias_norm_median,bias_norm_ci_high,bias_norm,tau_b,bias_norm_gt_tau,bx_contains_zero,by_contains_zero,significant_fixed_bias
+10,1.0,-0.4423933919114938,-0.16640158103863678,0.0996036101797868,-0.4928621430004976,-0.27861598175886826,-0.06134052006229641,0.13101417325525344,0.35693053991946755,0.5936072059427301,0.3315224554611094,0.5490364653303325,False,True,False,False

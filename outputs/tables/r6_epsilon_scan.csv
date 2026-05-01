@@ -1,0 +1,6 @@
+﻿model,selected_task_count,coverage_count,nominal_margin_sum,mean_scenario_margin_sum,worst_case_margin_sum,min_task_worst_margin,scenario_feasible_rate,high_risk_task_count,smoothing_stability_score,whether_contains_S04,whether_contains_P10,task_ids
+R6_eps_0.00,9,9,1.087,1.2555421245119942,0.5391950977578843,0.0,0.9407407407407408,5,0.9407407407407408,True,True,S04射击|S05射击|P11拍照|P10拍照|P04拍照|P01拍照|P02拍照|S15射击|S16射击
+R6_eps_0.02,6,6,0.887,1.0703496952375569,0.5391950977578843,0.027669406214460346,1.0,0,1.0,False,True,S03射击|P04拍照|P10拍照|P03拍照|P01拍照|S16射击
+R6_eps_0.05,5,5,0.77,0.9532839977323606,0.5115256915434241,0.05344933356507786,1.0,0,1.0,False,True,P10拍照|P04拍照|P03拍照|P01拍照|S16射击
+R6_eps_0.08,3,3,0.611,0.6941258797687173,0.42008632965368853,0.09556703470939887,1.0,0,1.0,False,False,P04拍照|P03拍照|P01拍照
+R6_eps_0.10,2,2,0.434,0.43446713143126076,0.3339489761763997,0.12394126339150062,1.0,0,1.0,False,False,P04拍照|P01拍照
