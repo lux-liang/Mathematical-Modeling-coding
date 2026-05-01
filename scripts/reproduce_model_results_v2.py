@@ -137,7 +137,7 @@ def build_scenario_candidates(fused3: pd.DataFrame, targets: pd.DataFrame, weigh
     return agg, per
 
 
-def select_robust_model(agg: pd.DataFrame, model: str, max_tasks: int = 9):
+def select_robust_model(agg: pd.DataFrame, model: str, max_tasks: int | None = None):
     if model == "R1":
         cand = agg[np.isclose(agg["scenario_feasible_rate"], 1.0) | (agg["scenario_feasible_rate"] > 0)].copy()
         cand = cand[cand["task_key"].str.endswith(tuple([]))] if False else cand
@@ -366,9 +366,9 @@ def main() -> None:
     ]:
         if model == "R1":
             c05 = per[0.5].copy()
-            selected, coverage, _raw = optimize_tasks_with_diagnostics(c05, max_tasks=9)
+            selected, coverage, _raw = optimize_tasks_with_diagnostics(c05, max_tasks=None)
         else:
-            selected, coverage, _raw, _cand = select_robust_model(agg, model, max_tasks=9)
+            selected, coverage, _raw, _cand = select_robust_model(agg, model, max_tasks=None)
         selected.to_csv(OUT / "tables" / fname, index=False, encoding="utf-8-sig")
         selected_models[model] = selected
         coverage["model"] = model

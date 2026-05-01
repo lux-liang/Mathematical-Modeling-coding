@@ -1,0 +1,4 @@
+﻿plan_name,shooting_events,photo_events,total_events,shooting_targets_covered,photo_targets_covered,expected_shooting_hits,total_photo_observations,multi_target_photo_events,mean_margin,min_margin,risk_count,solver_status
+pure_shooting,21,0,21,9,0,8.0997721875,0,0,0.118431996949819,0.003053626857507794,2,greedy_interval_fallback
+pure_photo,0,3,3,0,5,0.0,5,2,0.1980802996241596,0.15972452004161752,0,greedy_interval_fallback
+joint,19,2,21,9,4,8.0989115625,4,2,0.11772827009921416,0.003053626857507794,3,greedy_interval_fallback

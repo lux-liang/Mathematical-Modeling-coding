@@ -128,7 +128,7 @@ def _format_selected(selected: list[pd.Series]) -> pd.DataFrame:
     return pd.DataFrame(out_rows)
 
 
-def select_tasks(candidates: pd.DataFrame, max_tasks: int = 9, min_gap: float = 0.1) -> pd.DataFrame:
+def select_tasks(candidates: pd.DataFrame, max_tasks: int | None = None, min_gap: float = 0.1) -> pd.DataFrame:
     if candidates.empty:
         return pd.DataFrame(columns=["序号", "目标编号", "任务", "开始准备时刻(s)", "任务执行时刻(s)"])
     selected = []
@@ -136,7 +136,7 @@ def select_tasks(candidates: pd.DataFrame, max_tasks: int = 9, min_gap: float = 
     used_shots: set[str] = set()
     ordered = candidates.sort_values(["exec_time", "margin"], ascending=[True, False])
     for _, cand in ordered.iterrows():
-        if len(selected) >= max_tasks:
+        if max_tasks is not None and len(selected) >= max_tasks:
             break
         if selected and cand["start_time"] < selected[-1]["exec_time"] + min_gap:
             continue
@@ -154,16 +154,18 @@ def select_tasks(candidates: pd.DataFrame, max_tasks: int = 9, min_gap: float = 
     return _format_selected(selected)
 
 
-def optimize_tasks(candidates: pd.DataFrame, max_tasks: int = 9) -> pd.DataFrame:
+def optimize_tasks(candidates: pd.DataFrame, max_tasks: int | None = None) -> pd.DataFrame:
     selected, _coverage, _raw = optimize_tasks_with_diagnostics(candidates, max_tasks=max_tasks)
     return selected
 
 
-def optimize_tasks_with_diagnostics(candidates: pd.DataFrame, max_tasks: int = 9) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def optimize_tasks_with_diagnostics(candidates: pd.DataFrame, max_tasks: int | None = None) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     if candidates.empty:
         return _format_selected([]), pd.DataFrame(), pd.DataFrame()
     cand = candidates.sort_values(["exec_time", "margin"], ascending=[True, False]).reset_index(drop=True)
     n = len(cand)
+    if max_tasks is None:
+        max_tasks = n
 
     target_ids = sorted(cand["目标编号"].astype(str).unique())
     target_var = {tid: n + i for i, tid in enumerate(target_ids)}
@@ -345,7 +347,7 @@ def verify_selected_tasks(traj: pd.DataFrame, targets: pd.DataFrame, tasks: pd.D
     return pd.DataFrame(rows)
 
 
-def optimize_with_verification(candidates: pd.DataFrame, traj: pd.DataFrame, targets: pd.DataFrame, max_tasks: int = 9) -> tuple[pd.DataFrame, pd.DataFrame]:
+def optimize_with_verification(candidates: pd.DataFrame, traj: pd.DataFrame, targets: pd.DataFrame, max_tasks: int | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
     working = candidates.copy()
     for _ in range(10):
         selected = optimize_tasks(working, max_tasks=max_tasks)

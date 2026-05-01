@@ -301,7 +301,7 @@ def fuse_with_weight(fused_aligned: pd.DataFrame, w1: float) -> pd.DataFrame:
     return out
 
 
-def task_metrics_for_traj(traj: pd.DataFrame, targets: pd.DataFrame, max_tasks: int = 9):
+def task_metrics_for_traj(traj: pd.DataFrame, targets: pd.DataFrame, max_tasks: int | None = None):
     cand = generate_candidates(traj, targets)
     selected, verification = optimize_with_verification(cand, traj, targets, max_tasks=max_tasks)
     ids = "|".join((selected["目标编号"].astype(str) + selected["任务"].astype(str)).tolist()) if not selected.empty else ""

@@ -1,0 +1,4 @@
+﻿fov_degree,selected_events,covered_targets,total_target_observations,multi_target_events,mean_margin
+30.0,4,4,4,0,0.23337260536360166
+45.0,3,5,5,2,0.1980802996241596
+60.0,3,6,7,3,0.1980802996241596

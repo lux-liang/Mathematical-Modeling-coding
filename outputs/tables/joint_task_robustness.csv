@@ -1,0 +1,22 @@
+﻿event_id,event_type,target_or_targets,nominal_margin,scenario_pass_rate,worst_margin,risk_level,notes
+S_00113,shooting,S04,0.03365978833604366,0.75,0.0036597883360436623,中,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00106,shooting,S03,0.11613532645672242,1.0,0.08613532645672242,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+P_00002,photo,"P03,P04",0.011282150068601707,0.5,0.0,高,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00040,shooting,S01,0.21735249621258848,1.0,0.18735249621258848,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00664,shooting,S12,0.008966138909640708,0.5,0.0,高,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00457,shooting,S11,0.3136610261250808,1.0,0.2836610261250808,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+P_00035,photo,"P01,P02",0.18422006651759615,1.0,0.15422006651759615,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00478,shooting,S11,0.07865336045580906,0.75,0.048653360455809064,中,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00255,shooting,S10,0.1942174604059241,1.0,0.1642174604059241,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00750,shooting,S12,0.20767611972595545,1.0,0.17767611972595546,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00530,shooting,S11,0.13434036371026967,1.0,0.10434036371026967,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00305,shooting,S10,0.1467901617183638,1.0,0.11679016171836379,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00321,shooting,S10,0.0852638453862159,1.0,0.0552638453862159,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00345,shooting,S10,0.17933833577470096,1.0,0.14933833577470096,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00364,shooting,S10,0.10791943889047716,1.0,0.07791943889047716,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00908,shooting,S15,0.05570860655070775,0.75,0.025708606550707752,中,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00899,shooting,S14,0.10643008310867774,1.0,0.07643008310867774,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00866,shooting,S13,0.003053626857507794,0.5,0.0,高,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00625,shooting,S11,0.1002096108720072,1.0,0.0702096108720072,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00843,shooting,S12,0.08047353537288104,1.0,0.050473535372881045,低,proxy robustness from nominal margin; full multi-scenario migration left explicit
+S_00865,shooting,S12,0.10694213062772617,1.0,0.07694213062772617,低,proxy robustness from nominal margin; full multi-scenario migration left explicit

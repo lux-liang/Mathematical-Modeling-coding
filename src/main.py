@@ -11,8 +11,9 @@ import numpy as np
 import pandas as pd
 
 from data_io import generate_data_report, read_position_workbook, read_targets
-from fill_result import fill_result_template
+from fill_result import fill_result_template_v2
 from fusion import fuse_attachment
+from kalman_bias import run_kalman_bias_attachment2
 from kinematics import add_kinematics
 from plotting import (
     plot_aligned,
@@ -24,8 +25,10 @@ from plotting import (
     plot_task_timeline,
     plot_tasks,
 )
-from task_opt import compare_task_solutions, generate_candidates, optimize_with_verification, select_tasks
+from task_events import run_event_task_optimization
+from task_opt import generate_candidates
 from validation import bootstrap_bias_test, compare_bias_models, residual_dataframe, validate_alignment
+from bias_structure import run_attachment3_bias_structure
 
 
 def save_alignment_summary(rows: list[dict[str, object]]) -> None:
@@ -131,6 +134,16 @@ def main() -> None:
     pd.DataFrame(validation_rows).to_csv(OUTPUTS / "tables" / "alignment_validation.csv", index=False, encoding="utf-8-sig")
     pd.DataFrame(bias_model_rows).to_csv(OUTPUTS / "tables" / "bias_model_selection.csv", index=False, encoding="utf-8-sig")
     pd.DataFrame([bias_test]).to_csv(OUTPUTS / "tables" / "system_bias_test.csv", index=False, encoding="utf-8-sig")
+    run_kalman_bias_attachment2(
+        attachments["附件2"][next(s for s in attachments["附件2"] if "方式1" in s)],
+        attachments["附件2"][next(s for s in attachments["附件2"] if "方式2" in s)],
+        OUTPUTS,
+    )
+    run_attachment3_bias_structure(
+        attachments["附件3"][next(s for s in attachments["附件3"] if "方式1" in s)],
+        attachments["附件3"][next(s for s in attachments["附件3"] if "方式2" in s)],
+        OUTPUTS,
+    )
 
     traj3 = fused_outputs["附件3"]
     if "speed" not in traj3.columns:
@@ -140,24 +153,17 @@ def main() -> None:
     plot_fused_trajectory(traj3, "附件3融合10Hz轨迹", OUTPUTS / "figures" / "attachment3_fused_10hz.png")
 
     candidates = generate_candidates(traj3, targets)
-    candidates.to_csv(OUTPUTS / "tables" / "task_candidates.csv", index=False, encoding="utf-8-sig")
-    greedy = select_tasks(candidates, max_tasks=9)
-    greedy.to_csv(OUTPUTS / "tables" / "greedy_selected_tasks.csv", index=False, encoding="utf-8-sig")
-    selected, verification = optimize_with_verification(candidates, traj3, targets, max_tasks=9)
-    selected.to_csv(OUTPUTS / "tables" / "optimized_selected_tasks.csv", index=False, encoding="utf-8-sig")
-    compare_task_solutions(greedy, selected).to_csv(OUTPUTS / "tables" / "task_optimization_compare.csv", index=False, encoding="utf-8-sig")
-    verification.to_csv(OUTPUTS / "tables" / "selected_tasks_verification.csv", index=False, encoding="utf-8-sig")
-    selected.to_csv(OUTPUTS / "tables" / "selected_tasks.csv", index=False, encoding="utf-8-sig")
-    fill_result_template(BASE_DIR / "result.xlsx", OUTPUTS / "result_filled.xlsx", selected, max_rows=9)
-    plot_tasks(traj3, targets, selected, OUTPUTS / "figures" / "selected_tasks_distribution.png")
-    plot_task_timeline(candidates, selected, OUTPUTS / "figures" / "task_window_timeline.png")
+    candidates.to_csv(OUTPUTS / "tables" / "legacy_task_candidates_single_target.csv", index=False, encoding="utf-8-sig")
+    task_outputs = run_event_task_optimization(traj3, targets, OUTPUTS, fov_main=45.0)
+    selected = task_outputs["joint_selected"]
+    fill_result_template_v2(BASE_DIR / "result.xlsx", OUTPUTS / "result_filled_v2.xlsx", selected)
+    plot_task_timeline(candidates, pd.DataFrame(), OUTPUTS / "figures" / "legacy_candidate_timeline.png")
     plot_task_feasibility_heatmap(candidates, OUTPUTS / "figures" / "task_feasibility_heatmap.png")
 
     print(f"候选任务数: {len(candidates)}")
-    print(f"贪心任务数: {len(greedy)}")
-    print(f"优化任务数: {len(selected)}")
-    print(f"最终任务约束复核: {bool((not verification.empty) and verification['pass_all'].all())}")
-    print(f"结果模板已输出: {OUTPUTS / 'result_filled.xlsx'}")
+    print(f"联合事件任务数: {len(selected)}")
+    print(f"任务方案对比已输出: {OUTPUTS / 'tables' / 'task_plan_comparison.csv'}")
+    print(f"结果模板已输出: {OUTPUTS / 'result_filled_v2.xlsx'}")
 
 
 if __name__ == "__main__":

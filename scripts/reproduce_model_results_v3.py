@@ -180,7 +180,7 @@ def select_v3_model(agg: pd.DataFrame, model: str, epsilon: float = 0.0):
         cand["margin"] = 0.50 * cand["margin_mean"] + 0.40 * cand["margin_worst"] - 0.40 * cand["risk_penalty"]
     else:
         raise ValueError(model)
-    selected, coverage, raw = optimize_tasks_with_diagnostics(cand, max_tasks=9)
+    selected, coverage, raw = optimize_tasks_with_diagnostics(cand, max_tasks=None)
     return selected, coverage, raw, cand
 
 
