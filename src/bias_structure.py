@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from scipy.interpolate import CubicSpline
 from scipy.ndimage import uniform_filter1d
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.pipeline import make_pipeline
@@ -88,8 +88,8 @@ def _fit_predict(model_name: str, x_train: np.ndarray, y_train: np.ndarray, x_te
         reg = make_pipeline(StandardScaler(), Ridge(alpha=1.0)).fit(x_train, y_train)
         return reg.predict(x_test), reg, 16
     if model_name == "M4":
-        reg = RandomForestRegressor(n_estimators=120, max_depth=5, min_samples_leaf=12, random_state=42).fit(x_train, y_train)
-        return reg.predict(x_test), reg, 120
+        reg = make_pipeline(StandardScaler(), KernelRidge(alpha=2.0, kernel="rbf", gamma=0.35)).fit(x_train, y_train)
+        return reg.predict(x_test), reg, len(x_train)
     raise ValueError(model_name)
 
 
@@ -111,7 +111,7 @@ def run_attachment3_bias_structure(df1: pd.DataFrame, df2: pd.DataFrame, out_dir
         "M1": "constant translation bias",
         "M2": "linear time-varying bias",
         "M3": "state-related linear Ridge bias",
-        "M4": "nonlinear random-forest bias with blocked CV",
+        "M4": "nonlinear RBF kernel-ridge bias with blocked CV",
     }
     rows = []
     full_models = {}
@@ -196,19 +196,36 @@ def _plot_bias_structure(data: pd.DataFrame, comparison: pd.DataFrame, figs: Pat
         ax.legend(frameon=False)
     axes[1].set_xlabel("时间 / s")
     fig.suptitle("附件3残差分量随时间变化")
-    _save_both(fig, figs / "attachment3_residual_time_trend.png")
+    _save_both(fig, figs / "attachment3_residual_time_trend_clean.png")
 
     step = max(1, len(data) // 120)
     fig, ax = plt.subplots(figsize=(7.0, 5.4))
     part = data.iloc[::step]
     ax.plot(data["x"], data["y"], color="#9CA3AF", lw=0.9, label="状态估计轨迹")
-    ax.quiver(part["x"], part["y"], part["residual_x"], part["residual_y"], angles="xy", scale_units="xy", scale=14, color="#B94A48", width=0.003, alpha=0.75)
+    norm = np.sqrt(part["residual_x"] ** 2 + part["residual_y"] ** 2)
+    q = ax.quiver(
+        part["x"],
+        part["y"],
+        part["residual_x"],
+        part["residual_y"],
+        norm,
+        angles="xy",
+        scale_units="xy",
+        scale=14,
+        cmap="viridis",
+        width=0.003,
+        alpha=0.78,
+    )
+    ax.scatter(data["x"].iloc[0], data["y"].iloc[0], marker="o", s=42, color="#2A9D8F", label="起点")
+    ax.scatter(data["x"].iloc[-1], data["y"].iloc[-1], marker="s", s=42, color="#B94A48", label="终点")
+    cbar = fig.colorbar(q, ax=ax, fraction=0.035, pad=0.02)
+    cbar.set_label("残差范数 / m")
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlabel("X / m")
     ax.set_ylabel("Y / m")
     ax.set_title("附件3残差向量场")
     ax.legend(frameon=False)
-    _save_both(fig, figs / "attachment3_residual_vector_field.png")
+    _save_both(fig, figs / "attachment3_residual_vector_field_clean.png")
 
     fig, ax = plt.subplots(figsize=(7.4, 4.2))
     x = np.arange(len(comparison))
@@ -218,7 +235,7 @@ def _plot_bias_structure(data: pd.DataFrame, comparison: pd.DataFrame, figs: Pat
     ax.set_ylabel("RMSE / m")
     ax.set_title("附件3系统偏差模型比较")
     ax.legend(frameon=False)
-    _save_both(fig, figs / "attachment3_bias_model_comparison.png")
+    _save_both(fig, figs / "attachment3_bias_model_cv_compare_clean.png")
 
     fig, axes = plt.subplots(2, 2, figsize=(8.2, 5.8))
     pairs = [("v", "速度 / (m/s)"), ("a", "加速度 / (m/s²)"), ("theta", "航向角 / rad"), ("curvature", "曲率近似")]
@@ -229,4 +246,18 @@ def _plot_bias_structure(data: pd.DataFrame, comparison: pd.DataFrame, figs: Pat
         ax.set_ylabel("残差 / m")
     axes[0, 0].legend(frameon=False)
     fig.suptitle("附件3残差与运动状态关系")
-    _save_both(fig, figs / "attachment3_residual_vs_state.png")
+    _save_both(fig, figs / "attachment3_residual_state_relation_clean.png")
+
+    # Compatibility aliases used by the writing repository before the final cleanup.
+    for old, new in [
+        ("attachment3_residual_time_trend.png", "attachment3_residual_time_trend_clean.png"),
+        ("attachment3_residual_vector_field.png", "attachment3_residual_vector_field_clean.png"),
+        ("attachment3_bias_model_comparison.png", "attachment3_bias_model_cv_compare_clean.png"),
+        ("attachment3_residual_vs_state.png", "attachment3_residual_state_relation_clean.png"),
+    ]:
+        src_png = figs / new
+        if src_png.exists():
+            (figs / old).write_bytes(src_png.read_bytes())
+        src_pdf = src_png.with_suffix(".pdf")
+        if src_pdf.exists():
+            (figs / old).with_suffix(".pdf").write_bytes(src_pdf.read_bytes())

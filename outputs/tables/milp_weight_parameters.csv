@@ -1,0 +1,7 @@
+﻿parameter,value,role
+M1_target_completion,1000.0,expected shooting hits and photo target coverage
+M2_photo_observation,10.0,additional photo observations after first coverage
+M3_multi_target_photo,2.0,bonus for one photo covering more than one target
+M4_margin,0.25,nominal normalized stability margin
+M5_risk_A,0.2,risk penalty in task-utility-first plan
+M5_risk_B,3.0,risk penalty in margin-first conservative plan

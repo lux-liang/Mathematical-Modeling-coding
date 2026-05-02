@@ -1,0 +1,6 @@
+﻿dataset,diagnostic,value,unit,interpretation
+附件2,robust_residual_variance_x,0.25664070963225627,m^2,fixed-bias-corrected residual variance in x direction
+附件2,robust_residual_variance_y,0.27831587861537677,m^2,fixed-bias-corrected residual variance in y direction
+附件2,residual_sigma_norm,0.7314072656513833,m,nominal random observation-noise scale after fixed-bias correction
+附件2,r_base,0.2674782941238165,m^2,base measurement-noise covariance used by sensitivity configurations
+附件2,rts_rmse_gain_vs_robust,0.00010774712060812597,m,small gain confirms RTS is validation/smoothing rather than a large RMSE-reduction model

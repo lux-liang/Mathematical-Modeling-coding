@@ -1,0 +1,2 @@
+﻿dataset,Delta,overlap_start,overlap_end,n_10hz_points,rmse_before,rmse_after,output_file
+附件1,-198.4317014517301,270.3999985482699,970.75,7004,5.698132965663562,9.055190894551714e-08,/home/lux_liang/work/projects/github/数模校赛B题/outputs/trajectories/fused_attachment1_10hz.csv

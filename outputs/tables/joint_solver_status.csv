@@ -1,0 +1,3 @@
+﻿solver,status,objective_value,mip_gap,runtime_sec,n_variables,n_constraints,n_candidate_events,n_shooting_events,n_photo_events,n_time_conflict_edges,n_photo_angle_conflict_edges,n_pruned_by_margin,weight_M1_target_completion,weight_M2_photo_observation,weight_M3_multi_target_photo,weight_M4_margin,weight_M5_risk,used_fallback,plan_name
+scipy.milp,Optimization terminated successfully. (HiGHS Status 7: Optimal),14163.159975912818,0.0,,1111,44294,1028,981,47,43744,467,0,1000.0,10.0,2.0,0.25,0.2,False,joint
+scipy.milp,Optimization terminated successfully. (HiGHS Status 7: Optimal),11451.971628254592,0.0,,800,22583,717,679,38,22210,290,311,1000.0,10.0,2.0,0.25,3.0,False,joint_conservative

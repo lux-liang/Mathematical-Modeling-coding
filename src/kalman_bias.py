@@ -236,12 +236,16 @@ def run_kalman_bias_attachment2(df1: pd.DataFrame, df2: pd.DataFrame, out_dir: P
                 "q_pos": cfg.q_pos,
                 "q_vel": cfg.q_vel,
                 "q_bias": cfg.q_bias,
-                "r1": cfg.r1,
-                "r2": cfg.r2,
+                "r1_x": cfg.r1,
+                "r1_y": cfg.r1,
+                "r2_x": cfg.r2,
+                "r2_y": cfg.r2,
                 "Delta": best_for_cfg["Delta"],
                 "bx": best_for_cfg["bx"],
                 "by": best_for_cfg["by"],
                 "rmse_after": best_for_cfg["rmse_after"],
+                "residual_var_x": best_for_cfg["residual_var_x"],
+                "residual_var_y": best_for_cfg["residual_var_y"],
                 "nll": best_for_cfg["nll"],
             }
         )
@@ -297,6 +301,47 @@ def run_kalman_bias_attachment2(df1: pd.DataFrame, df2: pd.DataFrame, out_dir: P
     sensitivity = pd.DataFrame(sens_rows)
     summary.to_csv(tables / "kalman_bias_attachment2_summary.csv", index=False, encoding="utf-8-sig")
     sensitivity.to_csv(tables / "kalman_bias_sensitivity.csv", index=False, encoding="utf-8-sig")
+    sensitivity.to_csv(tables / "kalman_qr_sensitivity.csv", index=False, encoding="utf-8-sig")
+    diagnostics = pd.DataFrame(
+        [
+            {
+                "dataset": "附件2",
+                "diagnostic": "robust_residual_variance_x",
+                "value": var_x,
+                "unit": "m^2",
+                "interpretation": "fixed-bias-corrected residual variance in x direction",
+            },
+            {
+                "dataset": "附件2",
+                "diagnostic": "robust_residual_variance_y",
+                "value": var_y,
+                "unit": "m^2",
+                "interpretation": "fixed-bias-corrected residual variance in y direction",
+            },
+            {
+                "dataset": "附件2",
+                "diagnostic": "residual_sigma_norm",
+                "value": float(np.sqrt(var_x + var_y)),
+                "unit": "m",
+                "interpretation": "nominal random observation-noise scale after fixed-bias correction",
+            },
+            {
+                "dataset": "附件2",
+                "diagnostic": "r_base",
+                "value": r_base,
+                "unit": "m^2",
+                "interpretation": "base measurement-noise covariance used by sensitivity configurations",
+            },
+            {
+                "dataset": "附件2",
+                "diagnostic": "rts_rmse_gain_vs_robust",
+                "value": float(rmse_after - after_rts),
+                "unit": "m",
+                "interpretation": "small gain confirms RTS is validation/smoothing rather than a large RMSE-reduction model",
+            },
+        ]
+    )
+    diagnostics.to_csv(tables / "attachment2_noise_residual_diagnostics.csv", index=False, encoding="utf-8-sig")
     _plot_kalman_attachment2(df1, df2, baseline, smoothed, figs)
     return summary, sensitivity, smoothed
 
@@ -311,6 +356,19 @@ def _save_both(fig: plt.Figure, path_png: Path) -> None:
 def _plot_kalman_attachment2(df1: pd.DataFrame, df2: pd.DataFrame, baseline: AlignmentResult, smoothed: pd.DataFrame, figs: Path) -> None:
     _setup_font()
     fused = resample_aligned(df1, df2, baseline, smooth_window=5)
+    summary_path = figs.parent / "tables" / "kalman_bias_attachment2_summary.csv"
+    if summary_path.exists():
+        summary = pd.read_csv(summary_path)
+        fig, ax = plt.subplots(figsize=(6.4, 4.0))
+        ax.bar(summary["method"], summary["rmse_after"], color=["#6B7280", "#356EA9", "#2A9D8F"])
+        ax.set_xlabel("方法")
+        ax.set_ylabel("校正后 RMSE / m")
+        ax.set_title("附件2三种方法 RMSE 对比")
+        ax.set_ylim(0, max(0.9, float(summary["rmse_after"].max()) * 1.18))
+        for i, val in enumerate(summary["rmse_after"]):
+            ax.text(i, float(val) + 0.015, f"{float(val):.3f}", ha="center", va="bottom", fontsize=9)
+        _save_both(fig, figs / "attachment2_method_rmse_compare.png")
+
     fig, ax = plt.subplots(figsize=(7.2, 5.4))
     ax.plot(df1[X_COL], df1[Y_COL], color="#9CA3AF", lw=0.8, alpha=0.65, label="方式1原始")
     ax.plot(df2[X_COL], df2[Y_COL], color="#C08497", lw=0.8, alpha=0.55, label="方式2原始")
@@ -319,9 +377,9 @@ def _plot_kalman_attachment2(df1: pd.DataFrame, df2: pd.DataFrame, baseline: Ali
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlabel("X / m")
     ax.set_ylabel("Y / m")
-    ax.set_title("附件2 Kalman-RTS 去噪与固定偏差估计")
-    ax.legend(frameon=False)
-    _save_both(fig, figs / "attachment2_kalman_denoising.png")
+    ax.set_title("附件2对齐、鲁棒校正与 RTS 平滑轨迹")
+    ax.legend(frameon=False, fontsize=8)
+    _save_both(fig, figs / "attachment2_trajectory_kalman_rts.png")
 
     a = _clean(df1)
     b = _clean(df2)
@@ -345,4 +403,17 @@ def _plot_kalman_attachment2(df1: pd.DataFrame, df2: pd.DataFrame, baseline: Ali
         ax.set_title(title)
         ax.set_xlabel("残差X / m")
     axes[0].set_ylabel("残差Y / m")
-    _save_both(fig, figs / "attachment2_residual_before_after_kalman.png")
+    _save_both(fig, figs / "attachment2_residual_distribution_compare.png")
+
+    # Keep the old filenames as compatibility aliases for the writing repository.
+    fig, ax = plt.subplots(figsize=(7.2, 5.4))
+    ax.plot(df1[X_COL], df1[Y_COL], color="#9CA3AF", lw=0.8, alpha=0.65, label="方式1原始")
+    ax.plot(df2[X_COL], df2[Y_COL], color="#C08497", lw=0.8, alpha=0.55, label="方式2原始")
+    ax.plot(fused[X_COL], fused[Y_COL], color="#356EA9", lw=1.2, label="鲁棒校正融合")
+    ax.plot(smoothed[X_COL], smoothed[Y_COL], color="#2A9D8F", lw=1.6, label="RTS 平滑")
+    ax.set_aspect("equal", adjustable="box")
+    ax.set_xlabel("X 坐标 / m")
+    ax.set_ylabel("Y 坐标 / m")
+    ax.set_title("附件2 Kalman-RTS 去噪与固定偏差估计")
+    ax.legend(frameon=False, fontsize=8)
+    _save_both(fig, figs / "attachment2_kalman_denoising.png")

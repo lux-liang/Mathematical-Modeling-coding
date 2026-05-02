@@ -1,0 +1,6 @@
+﻿plan_name,min_margin_filter,risk_weight,total_events,expected_shooting_hits,photo_targets_covered,combined_target_utility,mean_margin,min_margin,scenario_pass_rate,risk_count,objective_value,solver_status
+A0_max_utility,-1.0,0.2,25,8.0997721875,6,14.0997721875,0.10684614605085833,0.003053626857507794,0.86,5,14163.159975912818,Optimization terminated successfully. (HiGHS Status 7: Optimal)
+A1_light_margin,0.01,0.75,24,7.249772187499999,6,13.2497721875,0.11632582693614475,0.011282150068601707,0.8958333333333334,3,13311.170142461617,Optimization terminated successfully. (HiGHS Status 7: Optimal)
+A2_balanced,0.02,1.5,22,7.249341874999999,5,12.249341874999999,0.1303086573167797,0.024849206735746976,0.9318181818181818,2,12300.008572615243,Optimization terminated successfully. (HiGHS Status 7: Optimal)
+B_margin_first,0.03,3.0,21,6.399341874999999,5,11.399341875,0.13900061992249116,0.03365978833604366,0.9761904761904762,0,11451.971628254592,Optimization terminated successfully. (HiGHS Status 7: Optimal)
+B2_strict_margin,0.05,5.0,20,5.549341875,5,10.549341875,0.14426766150181353,0.05570860655070775,0.9875,0,10602.313213307509,Optimization terminated successfully. (HiGHS Status 7: Optimal)

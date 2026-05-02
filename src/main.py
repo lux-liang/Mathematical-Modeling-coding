@@ -9,13 +9,16 @@ os.environ.setdefault("MPLCONFIGDIR", str(OUTPUTS / ".mplconfig"))
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
+from alignment import _prepare, resample_aligned, rmse_for_delta
 from data_io import generate_data_report, read_position_workbook, read_targets
 from fill_result import fill_result_template_v2
 from fusion import fuse_attachment
 from kalman_bias import run_kalman_bias_attachment2
 from kinematics import add_kinematics
 from plotting import (
+    _setup_font,
     plot_aligned,
     plot_fused_trajectory,
     plot_raw,
@@ -33,6 +36,65 @@ from bias_structure import run_attachment3_bias_structure
 
 def save_alignment_summary(rows: list[dict[str, object]]) -> None:
     pd.DataFrame(rows).to_csv(OUTPUTS / "tables" / "alignment_summary.csv", index=False, encoding="utf-8-sig")
+
+
+def save_attachment1_outputs(data: dict[str, pd.DataFrame], result, fused: pd.DataFrame) -> None:
+    """Write the standalone problem-1 table and alignment figure."""
+
+    sheet1 = next(s for s in data if "方式1" in s)
+    sheet2 = next(s for s in data if "方式2" in s)
+    t1, x1, y1 = _prepare(data[sheet1], smooth_window=1)
+    t2, x2, y2 = _prepare(data[sheet2], smooth_window=1)
+    rmse_unaligned = rmse_for_delta(t1, x1, y1, t2, x2, y2, 0.0, estimate_bias=False)
+    out_file = OUTPUTS / "trajectories" / "fused_attachment1_10hz.csv"
+    row = {
+        "dataset": "附件1",
+        "Delta": result.delta,
+        "overlap_start": result.overlap_start,
+        "overlap_end": result.overlap_end,
+        "n_10hz_points": int(len(fused)),
+        "rmse_before": rmse_unaligned,
+        "rmse_after": result.rmse_after,
+        "output_file": str(out_file),
+    }
+    pd.DataFrame([row]).to_csv(OUTPUTS / "tables" / "attachment1_alignment_summary.csv", index=False, encoding="utf-8-sig")
+
+    curve_deltas = np.linspace(result.delta - 8.0, result.delta + 8.0, 121)
+    curve = [rmse_for_delta(t1, x1, y1, t2, x2, y2, float(d), estimate_bias=False) for d in curve_deltas]
+    _setup_font()
+    fig, axes = plt.subplots(2, 2, figsize=(10.2, 7.4))
+    axes[0, 0].plot(data[sheet1]["X坐标(m)"], data[sheet1]["Y坐标(m)"], lw=1.0, label="方式1")
+    axes[0, 0].plot(data[sheet2]["X坐标(m)"], data[sheet2]["Y坐标(m)"], lw=1.0, label="方式2")
+    axes[0, 0].set_title("对齐前两源轨迹")
+    axes[0, 0].set_xlabel("X 坐标 / m")
+    axes[0, 0].set_ylabel("Y 坐标 / m")
+    axes[0, 0].axis("equal")
+    axes[0, 0].legend(frameon=False, fontsize=8)
+
+    axes[0, 1].plot(fused["x1_aligned"], fused["y1_aligned"], lw=1.0, label="方式1")
+    axes[0, 1].plot(fused["x2_aligned_corrected"], fused["y2_aligned_corrected"], lw=1.0, label="方式2对齐后")
+    axes[0, 1].set_title("对齐后两源轨迹")
+    axes[0, 1].set_xlabel("X 坐标 / m")
+    axes[0, 1].set_ylabel("Y 坐标 / m")
+    axes[0, 1].axis("equal")
+    axes[0, 1].legend(frameon=False, fontsize=8)
+
+    axes[1, 0].plot(curve_deltas, curve, color="#356EA9", lw=1.3)
+    axes[1, 0].axvline(result.delta, color="#B94A48", ls="--", lw=1.0, label=f"Delta={result.delta:.4f}s")
+    axes[1, 0].set_title("RMSE-Delta 搜索曲线")
+    axes[1, 0].set_xlabel("Delta / s")
+    axes[1, 0].set_ylabel("RMSE / m")
+    axes[1, 0].legend(frameon=False, fontsize=8)
+
+    axes[1, 1].plot(fused["X坐标(m)"], fused["Y坐标(m)"], color="#2A9D8F", lw=1.5)
+    axes[1, 1].set_title("10Hz 融合轨迹")
+    axes[1, 1].set_xlabel("X 坐标 / m")
+    axes[1, 1].set_ylabel("Y 坐标 / m")
+    axes[1, 1].axis("equal")
+    fig.tight_layout()
+    fig.savefig(OUTPUTS / "figures" / "attachment1_time_alignment.png", dpi=320)
+    fig.savefig(OUTPUTS / "figures" / "attachment1_time_alignment.pdf")
+    plt.close(fig)
 
 
 def main() -> None:
@@ -108,6 +170,8 @@ def main() -> None:
             has_bias = "" if name != "附件2" else True
         out_path = OUTPUTS / "trajectories" / f"fused_attachment{name[-1]}_10hz.csv"
         fused.to_csv(out_path, index=False, encoding="utf-8-sig")
+        if name == "附件1":
+            save_attachment1_outputs(data, result, fused)
         plot_aligned(fused, f"{name}对齐后轨迹", OUTPUTS / "figures" / f"aligned_{name}.png")
         fused_outputs[name] = fused
         summary.append(
@@ -156,14 +220,14 @@ def main() -> None:
     candidates.to_csv(OUTPUTS / "tables" / "legacy_task_candidates_single_target.csv", index=False, encoding="utf-8-sig")
     task_outputs = run_event_task_optimization(traj3, targets, OUTPUTS, fov_main=45.0)
     selected = task_outputs["joint_selected"]
-    fill_result_template_v2(BASE_DIR / "result.xlsx", OUTPUTS / "result_filled_v2.xlsx", selected)
+    fill_result_template_v2(BASE_DIR / "result.xlsx", OUTPUTS / "result_filled_v3.xlsx", selected)
     plot_task_timeline(candidates, pd.DataFrame(), OUTPUTS / "figures" / "legacy_candidate_timeline.png")
     plot_task_feasibility_heatmap(candidates, OUTPUTS / "figures" / "task_feasibility_heatmap.png")
 
     print(f"候选任务数: {len(candidates)}")
     print(f"联合事件任务数: {len(selected)}")
     print(f"任务方案对比已输出: {OUTPUTS / 'tables' / 'task_plan_comparison.csv'}")
-    print(f"结果模板已输出: {OUTPUTS / 'result_filled_v2.xlsx'}")
+    print(f"结果模板已输出: {OUTPUTS / 'result_filled_v3.xlsx'}")
 
 
 if __name__ == "__main__":

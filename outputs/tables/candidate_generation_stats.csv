@@ -1,0 +1,6 @@
+﻿stage,raw_checks,feasible_events,pruned_count,notes
+shooting_window_enumeration,53730,981,52749,"target-time checks pruned by distance, speed, acceleration, and 1.5s preparation-window constraints"
+photo_window_direction_enumeration,10782,47,10735,"target-time checks generate direction events only when distance, FOV, speed, acceleration, and 0.5s window constraints hold"
+joint_milp_pool,1028,1028,0,events entering the main MILP after optional margin filtering
+time_conflict_edges,527878,43744,0,pairwise event-window overlap constraints q_i + q_j <= 1
+photo_angle_conflict_edges,1081,467,0,same-photo-target circular angle differences below 60 degrees
